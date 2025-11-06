@@ -68,7 +68,9 @@ def main():
         axarr[2,x].imshow(f3[0, :, :, CONVOLUTION_NUMBER], cmap='inferno')
         axarr[2,x].grid(False)
     
-    plt.show()
+    plt.savefig('activation_visualizations.png', dpi=150, bbox_inches='tight')
+    print("Activation visualizations saved as 'activation_visualizations.png'")
+    plt.close()
 
 
 if __name__ == "__main__":
