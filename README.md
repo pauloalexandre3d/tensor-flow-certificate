@@ -25,6 +25,8 @@ pip install -r requirements.txt
 
 ## Convolutional Neural Networks in TensorFlow
 
+Reaaaly nice of pratical application: https://www.youtube.com/watch?v=NlpS-DhayQA
+
 ## Natural Language Processing in TensorFlow
 
 ## Sequences, Time Series and Prediction
