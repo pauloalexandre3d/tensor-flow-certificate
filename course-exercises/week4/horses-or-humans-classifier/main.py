@@ -15,6 +15,8 @@ from ipywidgets import widgets
 # Import display function
 from display_images import display_predictions
 
+from intermediate_representaion import show_intermediate_representation
+
 TRAIN_DIR = 'horse-or-human'
 
 def main():
@@ -113,6 +115,8 @@ def main():
     plotAcuracuty(history)
 
     display_predictions(model,rescale_layer)
+
+    show_intermediate_representation(model, rescale_layer)
 
 
 
