@@ -49,7 +49,11 @@ def show_intermediate_representation(
             for i in range(n_features):
                 x = feature_map[0, :, :, i]
                 x -= x.mean()
-                x /= x.std()
+                std = x.std()
+                if std > 0:
+                    x /= std
+                else:
+                    x = np.zeros_like(x)  # or keep original values
                 x *= 64
                 x += 128
                 x = np.clip(x, 0, 255).astype('uint8')
@@ -63,3 +67,4 @@ def show_intermediate_representation(
             plt.title(layer_name)
             plt.grid(False)
             plt.imshow(display_grid, aspect='auto', cmap='viridis')
+            plt.show()

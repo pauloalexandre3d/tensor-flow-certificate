@@ -1,16 +1,15 @@
 import os
 import random
+
+import matplotlib
+matplotlib.use('Qt5Agg')
 import numpy as np
-from io import BytesIO
 
 # Plotting and dealing with images
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 import tensorflow as tf
-
-# Interactive widgets
-from ipywidgets import widgets
 
 # Import display function
 from display_images import display_predictions
@@ -19,8 +18,8 @@ from intermediate_representaion import show_intermediate_representation
 
 TRAIN_DIR = 'horse-or-human'
 
-def main():
 
+def main():
     # You should see a `horse-or-human` folder here
     print(f"files in current directory: {os.listdir()}")
 
@@ -42,11 +41,11 @@ def main():
     print(f"total training horse images: {len(os.listdir(train_horse_dir))}")
     print(f"total training human images: {len(os.listdir(train_human_dir))}")
 
-    plotTrainingExamples(train_horse_dir, train_horse_names, train_human_dir, train_human_names)
+    plot_training_examples(train_horse_dir, train_horse_names, train_human_dir, train_human_names)
 
-    model = buildModel()
+    model = build_model()
 
-    train_dataset = createTrainingDataset()
+    train_dataset = create_training_dataset()
 
     # Get one batch from the dataset
     sample_batch = list(train_dataset.take(1))[0]
@@ -62,7 +61,7 @@ def main():
     # Check the shapes
     print(f'image batch shape: {image_batch.shape}')
     print(f'label batch shape: {label_batch.shape}')
-    
+
     # You can also preview the image array so you can compare the pixel values later in the next step of the preprocessing.
     print(image_batch[0].numpy())
 
@@ -70,7 +69,7 @@ def main():
     print(f'max value: {np.max(image_batch[0].numpy())}')
     print(f'min value: {np.min(image_batch[0].numpy())}')
 
-    rescale_layer = tf.keras.layers.Rescaling(scale=1./255)
+    rescale_layer = tf.keras.layers.Rescaling(scale=1. / 255)
     image_scaled = rescale_layer(image_batch[0]).numpy()
     print(image_scaled)
     print(f'max value: {np.max(image_scaled)}')
@@ -87,7 +86,7 @@ def main():
     # dataset_scaled = dataset.map(rescale_image)
 
     # Get one batch of data
-    sample_batch =  list(train_dataset_scaled.take(1))[0]
+    sample_batch = list(train_dataset_scaled.take(1))[0]
 
     # Get the image
     image_scaled = sample_batch[0][1].numpy()
@@ -101,26 +100,27 @@ def main():
     PREFETCH_BUFFER_SIZE = tf.data.AUTOTUNE
 
     train_dataset_final = (train_dataset_scaled
-                        .cache()
-                        .shuffle(SHUFFLE_BUFFER_SIZE)
-                        .prefetch(PREFETCH_BUFFER_SIZE)
-                        )
-    
+                           .cache()
+                           .shuffle(SHUFFLE_BUFFER_SIZE)
+                           .prefetch(PREFETCH_BUFFER_SIZE)
+                           )
+
     history = model.fit(
         train_dataset_final,
         epochs=15,
         verbose=2
     )
 
-    plotAcuracuty(history)
+    plot_accuracy(history)
 
-    display_predictions(model,rescale_layer)
+    display_predictions(model, rescale_layer)
 
-    show_intermediate_representation(model, rescale_layer)
+    show_intermediate_representation(model, rescale_layer,
+                                     train_horse_dir, train_horse_names,
+                                     train_human_dir, train_human_names)
 
 
-
-def plotTrainingExamples(train_horse_dir, train_horse_names, train_human_dir, train_human_names):
+def plot_training_examples(train_horse_dir, train_horse_names, train_human_dir, train_human_names):
     # Parameters for your graph; you will output images in a 4x4 configuration
     nrows = 4
     ncols = 4
@@ -130,14 +130,14 @@ def plotTrainingExamples(train_horse_dir, train_horse_names, train_human_dir, tr
     fig.set_size_inches(ncols * 3, nrows * 3)
 
     next_horse_pix = [os.path.join(train_horse_dir, fname)
-                    for fname in random.sample(train_horse_names, k=8)]
+                      for fname in random.sample(train_horse_names, k=8)]
     next_human_pix = [os.path.join(train_human_dir, fname)
-                    for fname in random.sample(train_human_names, k=8)]
+                      for fname in random.sample(train_human_names, k=8)]
 
     for i, img_path in enumerate(next_horse_pix + next_human_pix):
         # Set up subplot; subplot indices start at 1
         sp = plt.subplot(nrows, ncols, i + 1)
-        sp.axis('Off') # Don't show axes (or gridlines)
+        sp.axis('Off')  # Don't show axes (or gridlines)
 
         img = mpimg.imread(img_path)
         plt.imshow(img)
@@ -145,25 +145,25 @@ def plotTrainingExamples(train_horse_dir, train_horse_names, train_human_dir, tr
     plt.show()
 
 
-def buildModel():
+def build_model():
     model = tf.keras.models.Sequential([
         # Note the input shape is the desired size of the image 300x300 with 3 bytes color
         # This is the first convolution
         tf.keras.Input(shape=(300, 300, 3)),
-        tf.keras.layers.Conv2D(16, (3,3), activation='relu'),
+        tf.keras.layers.Conv2D(16, (3, 3), activation='relu'),
         tf.keras.layers.MaxPooling2D(2, 2),
         # The second convolution
-        tf.keras.layers.Conv2D(32, (3,3), activation='relu'),
-        tf.keras.layers.MaxPooling2D(2,2),
+        tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
+        tf.keras.layers.MaxPooling2D(2, 2),
         # The third convolution
-        tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
-        tf.keras.layers.MaxPooling2D(2,2),
+        tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+        tf.keras.layers.MaxPooling2D(2, 2),
         # The fourth convolution
-        tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
-        tf.keras.layers.MaxPooling2D(2,2),
+        tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+        tf.keras.layers.MaxPooling2D(2, 2),
         # The fifth convolution
-        tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
-        tf.keras.layers.MaxPooling2D(2,2),
+        tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+        tf.keras.layers.MaxPooling2D(2, 2),
         # Flatten the results to feed into a DNN
         tf.keras.layers.Flatten(),
         # 512 neuron hidden layer
@@ -180,8 +180,9 @@ def buildModel():
 
     return model
 
-def createTrainingDataset():
-   # Instantiate the dataset
+
+def create_training_dataset():
+    # Instantiate the dataset
     train_dataset = tf.keras.utils.image_dataset_from_directory(
         TRAIN_DIR,
         image_size=(300, 300),
@@ -194,9 +195,9 @@ def createTrainingDataset():
     print(f'train_dataset inherits from tf.data.Dataset: {issubclass(dataset_type, tf.data.Dataset)}')
     return train_dataset
 
-def plotAcuracuty(history):
-    # Plot the training accuracy for each epoch
 
+def plot_accuracy(history):
+    # Plot the training accuracy for each epoch
     acc = history.history['accuracy']
 
     epochs = range(len(acc))
@@ -205,6 +206,7 @@ def plotAcuracuty(history):
     plt.title('Training accuracy')
     plt.legend(loc=0)
     plt.show()
+
 
 if __name__ == "__main__":
     main()

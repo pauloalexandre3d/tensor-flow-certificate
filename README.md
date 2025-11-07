@@ -27,6 +27,10 @@ pip install -r requirements.txt
 
 Reaaaly nice of real pratical application: https://www.youtube.com/watch?v=NlpS-DhayQA
 
+The horses or humans classifier takes images under `horse-or-humans folder to train the model.
+
+After training, an images under the images folder is taken to predict. The label on top of the image shows if the image is a horse or a human.
+
 ## Natural Language Processing in TensorFlow
 
 ## Sequences, Time Series and Prediction
