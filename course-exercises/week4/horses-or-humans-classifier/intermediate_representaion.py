@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import os
+import numpy as np
 import random
 
 def show_intermediate_representation(
